@@ -1,12 +1,13 @@
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
+var cors = require("cors");
 
 const path = "http://localhost:9000/trips";
 const axios = require("axios").default;
 
 app.use(bodyParser.json());
-
+app.use(cors());
 getJSON = (req, res, next) => {
   console.log("Request URL:", req.originalUrl);
   axios
@@ -27,6 +28,7 @@ queryTrips = (req, res, next) => {
       .status(200)
       .json({ message: "Search is not set, return all", data: trips });
   }
+
   searchKeyword = (trip) => {
     let choose = false;
     trip.tags.forEach((tag) =>
@@ -36,6 +38,7 @@ queryTrips = (req, res, next) => {
     if (trip.description.includes(keyword)) choose = true;
     return choose;
   };
+
   const selectedTrips = trips.filter((trip) => searchKeyword(trip));
   if (selectedTrips) {
     res
