@@ -8,8 +8,8 @@ const axios = require("axios").default;
 
 app.use(bodyParser.json());
 app.use(cors());
+
 getJSON = (req, res, next) => {
-  console.log("Request URL:", req.originalUrl);
   axios
     .get(path)
     .then((res) => res.data)
@@ -17,25 +17,28 @@ getJSON = (req, res, next) => {
       req.trips = data;
       next();
     })
-    .catch((err) => res.status(500).json({ message: err }));
+    .catch((err) =>
+      res.status(500).json({ message: "Can't fetch data " + err })
+    );
 };
 
 queryTrips = (req, res, next) => {
   const keyword = req.query.keyword;
+  const keywords = keyword.split(" ");
   const trips = req.trips;
   if (!keyword) {
-    res
-      .status(200)
-      .json({ message: "Search is not set, return all", data: trips });
+    res.status(200).json({ message: "ALL trips", data: trips });
   }
 
   searchKeyword = (trip) => {
     let choose = false;
     trip.tags.forEach((tag) =>
-      tag.includes(keyword) ? (choose = true) : null
+      keywords.some((keyword) => tag.includes(keyword)) ? (choose = true) : null
     );
-    if (trip.title.includes(keyword)) choose = true;
-    if (trip.description.includes(keyword)) choose = true;
+
+    if (keywords.some((keyword) => trip.title.includes(keyword))) choose = true;
+    if (keywords.some((keyword) => trip.description.includes(keyword)))
+      choose = true;
     return choose;
   };
 
@@ -43,9 +46,9 @@ queryTrips = (req, res, next) => {
   if (selectedTrips) {
     res
       .status(200)
-      .json({ message: "Search is not set, return all", data: selectedTrips });
+      .json({ message: "Selected trip by keyword.", data: selectedTrips });
   } else {
-    res.status(200).json({ message: "Search not found ", data: {} });
+    res.status(200).json({ message: "Keyword not found", data: {} });
   }
 };
 
