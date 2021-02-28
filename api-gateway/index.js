@@ -24,10 +24,10 @@ getJSON = (req, res, next) => {
 
 queryTrips = (req, res, next) => {
   const keyword = req.query.keyword;
-  const keywords = keyword.split(" ");
+  const keywords = keyword ? keyword.split(" ") : keyword;
   const trips = req.trips;
   if (!keyword) {
-    res.status(200).json({ message: "ALL trips", data: trips });
+    return res.status(200).json({ message: "ALL trips", data: trips });
   }
 
   searchKeyword = (trip) => {
